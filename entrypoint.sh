@@ -23,7 +23,7 @@ echo "Looking up email address from commit"
 COMMITS_QUERY=`curl -s -H "${AUTH_HEADER}" -H "${API_HEADER}" -X GET "${URI}/repos/$REPO_FULLNAME/git/commits/$COMMIT"`
 echo
 echo "Commits query:\n $COMMITS_QUERY"
-COMMIT_EMAIL=`jq -r ".author.email" <<< $COMMITS_QUERY`
+COMMIT_EMAIL=`jq -r ".committer.email" <<< $COMMITS_QUERY`
 
 echo
 echo "Using the following input:"
