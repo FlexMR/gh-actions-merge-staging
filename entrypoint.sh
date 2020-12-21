@@ -33,7 +33,7 @@ echo "  * repo_name: $REPO_FULLNAME"
 echo "  * destination branch: $DESTINATION_BRANCH"
 echo "  * branch to merge changes from: $SOURCE_BRANCH"
 echo "  * commit: $COMMIT"
-echo "  * triggerd by: $COMMENT_USER"
+echo "  * triggered by: $COMMENT_USER"
 echo "  * user_name: $COMMIT_NAME"
 echo "  * user_email: $COMMIT_EMAIL"
 echo
@@ -57,7 +57,7 @@ fi;
 echo "Trying to merge the '$SOURCE_BRANCH' branch ($(git log -1 --pretty=%H $SOURCE_BRANCH)) into the '$DESTINATION_BRANCH' branch ($(git log -1 --pretty=%H $DESTINATION_BRANCH))"
 
 # Do the merge and push the branch
-if git merge --no-ff --no-edit $SOURCE_BRANCH && git push origin $DESTINATION_BRANCH; then
+if git merge --no-ff --no-edit -m "Merge branch '$SOURCE_BRANCH' into $DESTINATION_BRANCH" -m "Triggered by $COMMENT_USER" $SOURCE_BRANCH && git push origin $DESTINATION_BRANCH; then
   echo "Merge succeeded!"
   curl -s -H "${AUTH_HEADER}" -H "${API_HEADER}" -X POST -d "{\"body\": \":white_check_mark:  Merged $(git log -1 --pretty=%H $SOURCE_BRANCH) into \`$DESTINATION_BRANCH\` (see $(git log -1 --pretty=%H $DESTINATION_BRANCH))\"}" "${URI}/repos/$REPO_FULLNAME/issues/${PR_NUMBER}/comments"
   exit 0
