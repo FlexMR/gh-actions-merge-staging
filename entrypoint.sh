@@ -12,22 +12,27 @@ PR_NUMBER=$(jq -r ".pull_request.number" "$GITHUB_EVENT_PATH")
 REPO_FULLNAME=$(jq -r ".repository.full_name" "$GITHUB_EVENT_PATH")
 SOURCE_BRANCH=$(jq -r ".pull_request.head.ref" "$GITHUB_EVENT_PATH")
 COMMENT_USER=$(jq -r ".sender.login" "$GITHUB_EVENT_PATH")
+COMMIT=$(jq -r ".pull_request.sha" "$GITHUB_EVENT_PATH")
 
 URI=https://api.github.com
 API_HEADER="Accept: application/vnd.github.v3+json"
 AUTH_HEADER="Authorization: token $GITHUB_TOKEN"
+
+echo "Looking up email address from commit"
+COMMIT_EMAIL=`curl -s -H "${AUTH_HEADER}" -H "${API_HEADER}" -X GET "${URI}/repos/$REPO_FULLNAME/git/commits/$COMMIT" | jq -r ".author.email"`
 
 echo "Using the following input:"
 echo "  * pr number: $PR_NUMBER"
 echo "  * repo_name: $REPO_FULLNAME"
 echo "  * destination branch: $DESTINATION_BRANCH"
 echo "  * branch to merge changes from: $SOURCE_BRANCH"
+echo "  * commit: $COMMIT"
 echo "  * user_name: $COMMENT_USER"
-echo "  * user_email: $INPUT_USER_EMAIL"
+echo "  * user_email: $COMMIT_EMAIL"
 
 git remote set-url origin https://x-access-token:${!INPUT_PUSH_TOKEN}@github.com/$GITHUB_REPOSITORY.git
 git config --global user.name "$COMMENT_USER"
-git config --global user.email "$INPUT_USER_EMAIL"
+git config --global user.email "$COMMIT_EMAIL"
 
 git fetch origin $SOURCE_BRANCH
 git checkout -b $SOURCE_BRANCH origin/$SOURCE_BRANCH
