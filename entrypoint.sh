@@ -18,12 +18,15 @@ URI=https://api.github.com
 API_HEADER="Accept: application/vnd.github.v3+json"
 AUTH_HEADER="Authorization: token $GITHUB_TOKEN"
 
+echo
 echo "Looking up email address from commit"
 COMMITS_QUERY=`curl -s -H "${AUTH_HEADER}" -H "${API_HEADER}" -X GET "${URI}/repos/$REPO_FULLNAME/git/commits/$COMMIT"`
+echo
 echo "Commits query:\n $COMMITS_QUERY"
 COMMIT_EMAIL=`jq -r ".author.email" <<< $COMMITS_QUERY`
 
-echo "\nUsing the following input:"
+echo
+echo "Using the following input:"
 echo "  * pr number: $PR_NUMBER"
 echo "  * repo_name: $REPO_FULLNAME"
 echo "  * destination branch: $DESTINATION_BRANCH"
