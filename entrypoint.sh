@@ -19,10 +19,11 @@ API_HEADER="Accept: application/vnd.github.v3+json"
 AUTH_HEADER="Authorization: token $GITHUB_TOKEN"
 
 echo
-echo "Looking up email address from commit"
+echo "Looking up username and email address from commit"
 COMMITS_QUERY=`curl -s -H "${AUTH_HEADER}" -H "${API_HEADER}" -X GET "${URI}/repos/$REPO_FULLNAME/git/commits/$COMMIT"`
 echo
 echo "Commits query:\n $COMMITS_QUERY"
+COMMIT_NAME=`jq -r ".committer.name" <<< $COMMITS_QUERY`
 COMMIT_EMAIL=`jq -r ".committer.email" <<< $COMMITS_QUERY`
 
 echo
@@ -32,12 +33,13 @@ echo "  * repo_name: $REPO_FULLNAME"
 echo "  * destination branch: $DESTINATION_BRANCH"
 echo "  * branch to merge changes from: $SOURCE_BRANCH"
 echo "  * commit: $COMMIT"
-echo "  * user_name: $COMMENT_USER"
+echo "  * triggerd by: $COMMENT_USER"
+echo "  * user_name: $COMMIT_NAME"
 echo "  * user_email: $COMMIT_EMAIL"
 echo
 
 git remote set-url origin https://x-access-token:${!INPUT_PUSH_TOKEN}@github.com/$GITHUB_REPOSITORY.git
-git config --global user.name "$COMMENT_USER"
+git config --global user.name "$COMMIT_NAME"
 git config --global user.email "$COMMIT_EMAIL"
 
 git fetch origin $SOURCE_BRANCH
