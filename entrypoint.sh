@@ -2,6 +2,8 @@
 
 set -e
 
+git config --global --add safe.directory /github/workspace
+
 echo "Debugging event:"
 cat "$GITHUB_EVENT_PATH"
 
